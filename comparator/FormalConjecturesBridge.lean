@@ -77,21 +77,14 @@ lemma completedLFunction_ne_zero (hχ : χ.IsPrimitive) {s : ℂ} (hre : s.re �
   have hFE := (isPrimitive_inv hχ).completedLFunction_one_sub s
   rw [inv_inv, hΛ, mul_zero] at hFE
   have hre' : 1 ≤ (1 - s).re := by
-    rw [sub_re, one_re]
-    linarith
-  have h1s : (1 : ℂ) - s ≠ 0 := by
-    intro h
-    have := congrArg Complex.re h
-    rw [sub_re, one_re, zero_re] at this
-    linarith
+    simpa only [sub_re, one_re, sub_zero] using sub_le_sub_left hre (1 : ℝ)
+  have h1s : (1 : ℂ) - s ≠ 0 :=
+    ne_of_apply_ne re (zero_lt_one.trans_le hre').ne'
   have hL := LFunction_eq_completed_div_gammaFactor χ⁻¹ (1 - s) (Or.inl h1s)
   rw [hFE, zero_div] at hL
   refine LFunction_ne_zero_of_one_le_re χ⁻¹ ?_ hre' hL
   rcases h0 with h0 | hq
-  · right
-    intro h
-    apply h0
-    linear_combination -h
+  · exact Or.inr fun h ↦ h0 (sub_eq_self.mp h)
   · left
     rw [Ne, inv_eq_one]
     exact ne_one_of_isPrimitive hχ hq
