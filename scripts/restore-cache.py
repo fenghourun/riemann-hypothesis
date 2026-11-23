@@ -107,6 +107,12 @@ def restore_jobs(root, cache, rows):
     return jobs
 
 
+def create_output_directories(jobs):
+    """Create each leantar output directory once, in first-use order."""
+    for directory in dict.fromkeys(base for job in jobs for base in job["base"]):
+        Path(directory).mkdir(parents=True, exist_ok=True)
+
+
 def clear_output_hashes(root, rows):
     """Remove Lake's saved hashes of the outputs that leantar is about to replace.
 
@@ -161,9 +167,7 @@ def main():
     cache = (args.cache_dir or Path(os.environ.get("LAKE_CACHE_DIR", str(root / ".lake/cache")))).resolve()
     print(f"Checking {len(rows)} completed cached archives...", flush=True)
     jobs = restore_jobs(root, cache, rows)
-    # Many modules share an output directory; create each one once, in first-use order.
-    for directory in dict.fromkeys(base for job in jobs for base in job["base"]):
-        Path(directory).mkdir(parents=True, exist_ok=True)
+    create_output_directories(jobs)
     env = os.environ.copy()
     for key in list(env):
         if key.startswith(("AWS_", "CLOUDFLARE_", "CF_")) or key == "LAKE_CACHE_KEY":

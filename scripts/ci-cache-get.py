@@ -243,9 +243,7 @@ def consume(root, cache, record, identity, workers=24, fetcher=fetch):
     jobs = restore.restore_jobs(root, cache, rows)
     if current_identity(root) != identity:
         raise ValueError("project inputs changed before restoration")
-    for job in jobs:
-        for base in job["base"]:
-            Path(base).mkdir(parents=True, exist_ok=True)
+    restore.create_output_directories(jobs)
     env["RUST_MIN_STACK"] = str(max(int(env.get("RUST_MIN_STACK", "0")), 8388608))
     lean = Path(subprocess.check_output(["elan", "which", "lean"], cwd=root, env=env, text=True).strip())
     restore.clear_output_hashes(root, rows)
