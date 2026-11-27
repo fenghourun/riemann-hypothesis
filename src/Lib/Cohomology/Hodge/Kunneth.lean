@@ -263,7 +263,6 @@ private lemma bijective_lerayHirsch_reprBy {k : Type} [Field k] [CharZero k]
   -- Both sides are additive: compare them on `r • x ⊗ b j`.
   refine fun w ↦ w.induction_linear (by simp [map_zero])
     (fun u v hu hv ↦ by simp only [map_add, hu, hv]) fun ⟨⟨a, x⟩, j⟩ r ↦ ?_
-  -- The scalar `r` acts on the coefficients by `ρ`; move it out of the class of `r • b j` ...
   let ρ : hodgeCoeff (k := k) ⟶ hodgeCoeff := (CoeffAction.act r).asHom
   have h_forms : forms (single (⟨a, x⟩, j) r) =
       single ⟨a, x⟩ (homClass ((homReprEquiv c hodgeCoeff).symm (ρ.app c ⟨b j⟩))) := by
@@ -272,6 +271,7 @@ private lemma bijective_lerayHirsch_reprBy {k : Type} [Field k] [CharZero k]
   have h_classes : classes (single (⟨a, x⟩, j) r) = single j (r • x.val.toTotalH) := by
     simp [I, classes, DFinsupp.basis]
     rfl
+  -- The scalar `r` acts on the coefficients by `ρ`; move it out of the class of `r • b j` ...
   have h_scalar :
       (homReprEquiv c hodgeCoeff).symm (ρ.app c ⟨b j⟩) =
         (homReprEquiv c hodgeCoeff).symm ⟨b j⟩ ≫ ρ :=
@@ -285,7 +285,7 @@ private lemma bijective_lerayHirsch_reprBy {k : Type} [Field k] [CharZero k]
       rw [mul_smul_comm, smul_mul_assoc]
     exact abTensor_hom_ext fun A u v ↦ congrArg ULift.up (h_bilinear A u.down v.down)
   rw [h_forms, h_classes, lerayHirsch_single, lerayHirsch_single, TotalH.smul_eq_comp]
-  apply cross_comp_eq_comp_cross exteriorAlg.mulPairing ρ h_balanced h_scalar x.val
+  exact cross_comp_eq_comp_cross exteriorAlg.mulPairing ρ h_balanced h_scalar x.val
 
 /-- Künneth: over a field `k` of characteristic `0`, if `X` has an atlas of dimension `d`
 (`HasAtlas`: it yields a subfunctor that is locally all of `X` and is built from charts represented
